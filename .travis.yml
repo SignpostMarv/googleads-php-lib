@@ -7,12 +7,21 @@ php:
   - 7.1
   - 7.2
 
+matrix:
+  include:
+    - name: phpstan
+      php: 7.1
+      env: 'PHPSTAN=true'
+
 branches:
   only:
   - master
+  - phpstan
 
 before_script:
   - composer install
+  - if [[ $PHPSTAN ]]; then composer require --dev phpstan/phpstan-shim --no-interaction --prefer-dist; fi
 
 script:
+  - if [[ $PHPSTAN ]]; then vendor/bin/phpstan analyse -l 1 src; fi
   - vendor/phpunit/phpunit/phpunit --configuration phpunit.xml.dist --coverage-text
